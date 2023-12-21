@@ -1,4 +1,5 @@
 from flask import Flask, flash, request, redirect, url_for
+from flask_cors import CORS
 import os
 from werkzeug.utils import secure_filename
 import numpy as np
@@ -20,6 +21,7 @@ UPLOAD_FOLDER = './uploads'
 ALLOWED_EXTENSIONS = {'wav'}
 
 app = Flask(__name__)
+CORS(app)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 #load the model
@@ -162,8 +164,8 @@ def pred_segment(picture):
     img = tf.keras.utils.load_img(picture, target_size=(224, 224))
     x = tf.keras.utils.img_to_array(img)
     x = np.expand_dims(x, axis=0)
-    images = np.vstack([x])
-    classes = model1(images)
+    # images = np.vstack([x])
+    classes = model1(x)
     classes = classes.numpy().tolist()
     return classes
 
@@ -171,8 +173,8 @@ def pred_subject(picture):
     img = tf.keras.utils.load_img(picture, target_size=(224, 224))
     x = tf.keras.utils.img_to_array(img)
     x = np.expand_dims(x, axis=0)
-    images = np.vstack([x])
-    classes = model2(images)
+    # images = np.vstack([x])
+    classes = model2(x)
     classes = classes.numpy().tolist()
     return classes
 #----------------------------------------------------------------------------------------------------------------------------
@@ -250,7 +252,7 @@ def predict():
                     },
                     'segment_data': {
                         'labels' : time_segment.tolist(),
-                        'dataset': [{
+                        'datasets': [{
                             'label': 'Segment PCG',
                             'data' : segmenting
                         }]
